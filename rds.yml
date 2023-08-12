@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for RDS Aurora PostgreSQL with Subnet Groups and Encryption'
+
+Parameters:
+  DBName:
+    Description: 'Name of the database'
+    Type: String
+
+  MasterUsername:
+    Description: 'Master username for the database'
+    Type: String
+
+  MasterPassword:
+    Description: 'Master password for the database'
+    Type: String
+    NoEcho: true
+
+  DBInstanceClass:
+    Description: 'Instance class for the RDS'
+    Type: String
+
+  Version:
+    Description: 'PostgreSQL version'
+    Type: String
+    Default: '11.9'
+    AllowedValues:
+      - '11.9'
+      - '11.8'
+      - '11.7'
+      - '11.6'
+
+  VPCID:
+    Description: 'VPC ID where the RDS will be hosted'
+    Type: 'AWS::EC2::VPC::Id'
+
+  SubnetIds:
+    Description: 'Comma-separated list of existing subnet IDs where the RDS should be placed'
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Security group for RDS'
+      VpcId: !Ref VPCID
+      SecurityGroupIngress:
+        - IpProtocol: 'tcp'
+          FromPort: '5432'
+          ToPort: '5432'
+          CidrIp: '0.0.0.0/0' # You should restrict this to only the necessary IPs
+
+  DBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties:
+      DBSubnetGroupName: !Sub '${DBName}-subnet-group'
+      DBSubnetGroupDescription: 'Subnet group for the RDS'
+      SubnetIds: !Ref SubnetIds
+
+  RDSCluster:
+    Type: 'AWS::RDS::DBCluster'
+    Properties:
+      Engine: 'aurora-postgresql'
+      EngineVersion: !Ref Version
+      DatabaseName: !Ref DBName
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref MasterPassword
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref SecurityGroup
+      StorageEncrypted: true
+      DeletionProtection: false
+      AvailabilityZones:
+        - 'us-east-1a'
+        - 'us-east-1b'
+
+  RDSInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceIdentifier: !Sub '${DBName}-instance'
+      Engine: 'aurora'
+      DBInstanceClass: !Ref DBInstanceClass
+      DBClusterIdentifier: !Ref RDSCluster
+      PubliclyAccessible: false

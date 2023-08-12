@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Main Stack for RDS Aurora PostgreSQL with Subnet Groups and Encryption'
+Parameters:
+  VPCID:
+    Description: 'VPC ID where the RDS will be hosted'
+    Type: 'AWS::EC2::VPC::Id'
+  SubnetIds:
+    Description: 'List of existing subnet IDs where the RDS should be placed'
+    Type: List<AWS::EC2::Subnet::Id>
+Resources:
+  RDSAuroraPostgreSQLStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: 'https://cf-sqs-s3-test1327.s3.amazonaws.com/rds.yml'
+      Parameters:
+        DBName: MyDatabase
+        MasterUsername: uadacity
+        MasterPassword: 'MySecurePassword'
+        DBInstanceClass: 'db.r5.large'
+        Version: '11.9'
+        VPCID: !Ref VPCID
+        SubnetIds: !Join [",", !Ref SubnetIds] 
+
+
+  SQSAndDLQStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: 'https://cf-sqs-s3-test1327.s3.amazonaws.com/sqs.yml'
+      Parameters:
+        QueueName: MyQueue
+        DLQName: MyDeadLetterQueue
+        DelaySeconds: 5
+        MaxMessageSize: 256
+        MessageRetentionPeriod: 345600
+        VisibilityTimeout: 30
+
