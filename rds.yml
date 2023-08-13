@@ -5,6 +5,15 @@ Parameters:
   DBName:
     Description: 'Name of the database'
     Type: String
+  SGName:
+    Description: 'Name of the database'
+    Type: String
+  AZ1:
+    Description: 'Name of the database'
+    Type: String
+  AZ2:
+    Description: 'Name of the database'
+    Type: String
   MasterUsername:
     Description: 'Master username for the database'
     Type: String
@@ -30,12 +39,20 @@ Parameters:
   SubnetIds:
     Description: 'Comma-separated list of existing subnet IDs where the RDS should be placed'
     Type: List<AWS::EC2::Subnet::Id>
+  EnvironmentName:
+    Type: String
+    Default: "prod"
+  EnvironmentName1:
+    Type: String
+  EnvironmentName2:
+    Type: String
 
 Resources:
 
   MonitoringRole:
     Type: 'AWS::IAM::Role'
     Properties:
+      RoleName: wd-role-iam
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -62,6 +79,26 @@ Resources:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: 'Security group for RDS'
+      GroupName: !Ref SGName
+      Tags: 
+        - Key: environment
+          Value: !Ref EnvironmentName
+        - Key: environment1
+          Value: !Ref EnvironmentName1
+        - Key: environment2
+          Value: !Ref EnvironmentName2
+        - Key: environment3
+          Value:  staging
+        - Key: environment4
+          Value:  staging
+        - Key: environment5
+          Value:  staging
+        - Key: environment6
+          Value:  staging
+        - Key: environment7
+          Value:  staging
+        - Key: environment8
+          Value:  staging
       VpcId: !Ref VPCID
       SecurityGroupIngress:
         - IpProtocol: 'tcp'
@@ -76,12 +113,33 @@ Resources:
       DBSubnetGroupName: !Sub '${DBName}-subnet-group'
       DBSubnetGroupDescription: 'Subnet group for the RDS'
       SubnetIds: !Ref SubnetIds
+      Tags: 
+        - Key: environment
+          Value: !Ref EnvironmentName
+        - Key: environment1
+          Value: !Ref EnvironmentName1
+        - Key: environment2
+          Value: !Ref EnvironmentName2
+        - Key: environment3
+          Value:  staging
+        - Key: environment4
+          Value:  staging
+        - Key: environment5
+          Value:  staging
+        - Key: environment6
+          Value:  staging
+        - Key: environment7
+          Value:  staging
+        - Key: environment8
+          Value:  staging
 
   RDSCluster:
     Type: 'AWS::RDS::DBCluster'
     Properties:
       Engine: 'aurora-postgresql'
       EngineMode: 'serverless'
+      AssociatedRoles: !Ref MonitoringRole
+      DBClusterIdentifier: testing-rds
       EngineVersion: !Ref Version
       DatabaseName: !Ref DBName
       MasterUsername: !Ref MasterUsername
@@ -93,12 +151,28 @@ Resources:
       BackupRetentionPeriod: 7 # Number of days to retain backups
       DeletionProtection: false
       AvailabilityZones:
-        - 'us-east-1a'
-        - 'us-east-1b'
+        - !Ref AZ1
+        - !Ref AZ2
       ScalingConfiguration:
         AutoPause: true
         MinCapacity: 2
         MaxCapacity: 8
-
-      
-
+      Tags: 
+        - Key: environment
+          Value: !Ref EnvironmentName
+        - Key: environment1
+          Value: !Ref EnvironmentName1
+        - Key: environment2
+          Value: !Ref EnvironmentName2
+        - Key: environment3
+          Value:  staging
+        - Key: environment4
+          Value:  staging
+        - Key: environment5
+          Value:  staging
+        - Key: environment6
+          Value:  staging
+        - Key: environment7
+          Value:  staging
+        - Key: environment8
+          Value:  staging

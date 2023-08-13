@@ -25,11 +25,39 @@ Parameters:
     Description: 'The length of time, in seconds, for which Amazon SQS prevents other consumers from receiving and processing the message'
     Type: Number
 
+  EnvironmentName:
+    Type: String
+    Default: "prod"
+  EnvironmentName1:
+    Type: String
+  EnvironmentName2:
+    Type: String
+
+
 Resources:
   DeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: !Ref DLQName
+      Tags:
+        - Key: environment
+          Value: !Ref EnvironmentName
+        - Key: environment1
+          Value: !Ref EnvironmentName1
+        - Key: environment2
+          Value: !Ref EnvironmentName2
+        - Key: environment3
+          Value:  staging
+        - Key: environment4
+          Value:  staging
+        - Key: environment5
+          Value:  staging
+        - Key: environment6
+          Value:  staging
+        - Key: environment7
+          Value:  staging
+        - Key: environment8
+          Value:  staging
 
   MainQueue:
     Type: AWS::SQS::Queue
@@ -41,3 +69,24 @@ Resources:
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
         maxReceiveCount: 5
+      Tags:
+        - Key: environment
+          Value: !Ref EnvironmentName
+        - Key: environment1
+          Value: !Ref EnvironmentName1
+        - Key: environment2
+          Value: !Ref EnvironmentName2
+        - Key: environment3
+          Value:  staging
+        - Key: environment4
+          Value:  staging
+        - Key: environment5
+          Value:  staging
+        - Key: environment6
+          Value:  staging
+        - Key: environment7
+          Value:  staging
+        - Key: environment8
+          Value:  staging
+
+
