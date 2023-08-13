@@ -97,16 +97,8 @@ Resources:
         - 'us-east-1b'
       ScalingConfiguration:
         AutoPause: true
-        MinCapacity: 1
+        MinCapacity: 2
         MaxCapacity: 8
-      CloudWatchLogsExportConfiguration:
-        EnableLogTypes:
-          - 'postgresql' # Enable PostgreSQL logs
-      EnabledCloudwatchLogsExports:
-        - 'audit'
-        - 'error'
-        - 'general'
-      MonitoringInterval: 60 # Monitoring interval in seconds (0, 1, 5, 10, 15, 30, or 60)
-      MonitoringRoleArn: !Ref MonitoringRole
+
       
 
