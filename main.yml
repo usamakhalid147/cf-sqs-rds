@@ -11,7 +11,7 @@ Resources:
   RDSAuroraPostgreSQLStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: 'https://cf-sqs-rds-1327.s3.amazonaws.com/rds.yml'
+      TemplateURL: 'https://cf-s3-sqs-test.s3.amazonaws.com/rds.yml'
       Parameters:
         DBName: MyDatabase
         SGName: WD-SG-Prod-01
@@ -19,25 +19,34 @@ Resources:
         DBSubnetGroupName: WD-APS-Group-Prod-01
         AZ1: us-east-1a
         AZ2: us-east-1b
+        Environment: test
+        MinCapacity: 2
+        MaxCapacity: 8
+        Application: WD
+        Engine: APS
+        Increment: 2
         MasterUsername: uadacity
         MasterPassword: 'MySecurePassword'
-        DBInstanceClass: 'db.r5.large'
         EnvironmentName: "prod"
         EnvironmentName1: "prod"
         EnvironmentName2: "prod"
-        Version: '11.9'
+        Version: '11.19'
         VPCID: !Ref VPCID
         SubnetIds: !Join [",", !Ref SubnetIds] 
+        PreferredBackupWindow: '03:00-04:00'
+        PreferredMaintenanceWindow: 'Sun:05:00-Sun:06:00'
 
 
   SQSAndDLQStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: 'https://cf-sqs-rds-1327.s3.amazonaws.com/sqs.yml'
+      TemplateURL: 'https://cf-s3-sqs-test.s3.amazonaws.com/sqs.yml'
       Parameters:
         QueueName: MyQueue
         DLQName: MyDeadLetterQueue
         DelaySeconds: 5
+        Increment: 2
+        Environment: test
         MaxMessageSize: 256
         MessageRetentionPeriod: 345600
         VisibilityTimeout: 30

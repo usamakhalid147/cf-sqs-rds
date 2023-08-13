@@ -25,6 +25,15 @@ Parameters:
     Description: 'The length of time, in seconds, for which Amazon SQS prevents other consumers from receiving and processing the message'
     Type: Number
 
+  Environment:
+    Description: 'Name of the environment'
+    Type: String
+  Increment:
+    Description: 'Name of the increment'
+    Type: Number
+    Default: 1
+    MinValue: 1
+
   EnvironmentName:
     Type: String
     Default: "prod"
@@ -38,7 +47,7 @@ Resources:
   DeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Ref DLQName
+      QueueName: !Sub "SQS${DLQName}${Environment}${Increment}"  
       Tags:
         - Key: environment
           Value: !Ref EnvironmentName
@@ -62,7 +71,7 @@ Resources:
   MainQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Ref QueueName
+      QueueName: !Sub "SQS${QueueName}${Environment}${Increment}"  
       DelaySeconds: !Ref DelaySeconds
       MessageRetentionPeriod: !Ref MessageRetentionPeriod
       VisibilityTimeout: !Ref VisibilityTimeout

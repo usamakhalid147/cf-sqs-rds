@@ -6,14 +6,28 @@ Parameters:
     Description: 'Name of the database'
     Type: String
   DBIdenfitierName:
-    Description: 'Name of the database'
+    Description: 'Name of the database identifier' 
     Type: String
   DBSubnetGroupName:
-    Description: 'Name of the database'
+    Description: 'Name of the database subnet group'
     Type: String
   SGName:
     Description: 'Name of the database'
     Type: String
+  Environment:
+    Description: 'Name of the environment'
+    Type: String
+  Application:
+    Description: 'Name of the application'
+    Type: String
+  Engine:
+    Description: 'Name of the engine'
+    Type: String
+  Increment:
+    Description: 'Name of the increment'
+    Type: Number
+    Default: 1
+    MinValue: 1
   AZ1:
     Description: 'Name of the database'
     Type: String
@@ -23,22 +37,26 @@ Parameters:
   MasterUsername:
     Description: 'Master username for the database'
     Type: String
+  MinCapacity:
+    Description: 'Master username for the database'
+    Type: String
+  MaxCapacity:
+    Description: 'Master username for the database'
+    Type: Number
   MasterPassword:
     Description: 'Master password for the database'
-    Type: String
+    Type: Number
     NoEcho: true
-  DBInstanceClass:
-    Description: 'Instance class for the RDS'
-    Type: String
+
   Version:
     Description: 'PostgreSQL version'
     Type: String
-    Default: '11.9'
+    Default: '11.19'
     AllowedValues:
-      - '11.9'
-      - '11.8'
-      - '11.7'
-      - '11.6'
+      - '11.18'
+      - '11.19'
+      - '11.20'
+      - '11.21'
   VPCID:
     Description: 'VPC ID where the RDS will be hosted'
     Type: 'AWS::EC2::VPC::Id'
@@ -52,13 +70,19 @@ Parameters:
     Type: String
   EnvironmentName2:
     Type: String
+  PreferredBackupWindow:
+    Description: 'Preferred backup window for the RDS cluster'
+    Type: String
+  PreferredMaintenanceWindow:
+    Description: 'Preferred maintenance window for the RDS cluster'
+    Type: String
 
 Resources:
   SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: 'Security group for RDS'
-      GroupName: !Ref SGName
+      GroupName: !Sub "RDS${Application}${SGName}${Environment}${Increment}" 
       Tags: 
         - Key: environment
           Value: !Ref EnvironmentName
@@ -89,7 +113,7 @@ Resources:
   DBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
     Properties:
-      DBSubnetGroupName: !Ref DBSubnetGroupName
+      DBSubnetGroupName: !Sub "RDS${Application}${DBSubnetGroupName}${Environment}${Increment}" 
       DBSubnetGroupDescription: 'Subnet group for the RDS'
       SubnetIds: !Ref SubnetIds
       Tags: 
@@ -117,7 +141,7 @@ Resources:
     Properties:
       Engine: 'aurora-postgresql'
       EngineMode: 'serverless'
-      DBClusterIdentifier: !Ref DBIdenfitierName
+      DBClusterIdentifier: !Sub "RDS${Application}${Engine}${Environment}${Increment}"
       EngineVersion: !Ref Version
       DatabaseName: !Ref DBName
       MasterUsername: !Ref MasterUsername
@@ -133,8 +157,10 @@ Resources:
         - !Ref AZ2
       ScalingConfiguration:
         AutoPause: true
-        MinCapacity: 2
-        MaxCapacity: 8
+        MinCapacity: !Ref MinCapacity # Parameterized
+        MaxCapacity: !Ref MaxCapacity # Parameterized
+      PreferredBackupWindow: !Ref PreferredBackupWindow # Added
+      PreferredMaintenanceWindow: !Ref PreferredMaintenanceWindow
       Tags: 
         - Key: environment
           Value: !Ref EnvironmentName
