@@ -15,8 +15,10 @@ Resources:
       Parameters:
         DBName: MyDatabase
         SGName: WD-SG-Prod-01
-        AZ1: us-east-1
-        AZ2: us-east-2
+        DBIdenfitierName: WD-APS-Prod-01
+        DBSubnetGroupName: WD-APS-Group-Prod-01
+        AZ1: us-east-1a
+        AZ2: us-east-1b
         MasterUsername: uadacity
         MasterPassword: 'MySecurePassword'
         DBInstanceClass: 'db.r5.large'

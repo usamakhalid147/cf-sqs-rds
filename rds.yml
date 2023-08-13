@@ -5,6 +5,12 @@ Parameters:
   DBName:
     Description: 'Name of the database'
     Type: String
+  DBIdenfitierName:
+    Description: 'Name of the database'
+    Type: String
+  DBSubnetGroupName:
+    Description: 'Name of the database'
+    Type: String
   SGName:
     Description: 'Name of the database'
     Type: String
@@ -48,33 +54,6 @@ Parameters:
     Type: String
 
 Resources:
-
-  MonitoringRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      RoleName: wd-role-iam
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: 'Allow'
-            Principal:
-              Service:
-                - 'monitoring.rds.amazonaws.com'
-            Action:
-              - 'sts:AssumeRole'
-      Path: '/'
-      Policies:
-        - PolicyName: 'RDSMonitoringPolicy'
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: 'Allow'
-                Action:
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                  - 'logs:CreateLogGroup'
-                Resource: '*'
-
   SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -110,7 +89,7 @@ Resources:
   DBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
     Properties:
-      DBSubnetGroupName: !Sub '${DBName}-subnet-group'
+      DBSubnetGroupName: !Ref DBSubnetGroupName
       DBSubnetGroupDescription: 'Subnet group for the RDS'
       SubnetIds: !Ref SubnetIds
       Tags: 
@@ -138,8 +117,7 @@ Resources:
     Properties:
       Engine: 'aurora-postgresql'
       EngineMode: 'serverless'
-      AssociatedRoles: !Ref MonitoringRole
-      DBClusterIdentifier: testing-rds
+      DBClusterIdentifier: !Ref DBIdenfitierName
       EngineVersion: !Ref Version
       DatabaseName: !Ref DBName
       MasterUsername: !Ref MasterUsername
