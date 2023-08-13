@@ -69,13 +69,6 @@ Resources:
           ToPort: '5432'
           CidrIp: '0.0.0.0/0' # You should restrict this to only the necessary IPs
 
-  MyDBClusterParameterGroup:
-    Type: 'AWS::RDS::DBClusterParameterGroup'
-    Properties:
-      Description: Custom parameter group for PostGIS and pgvector
-      Family: aurora-postgresql
-      Parameters:
-        shared_preload_libraries: 'postgis,pgvector'
 
   DBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
@@ -115,5 +108,5 @@ Resources:
         - 'general'
       MonitoringInterval: 60 # Monitoring interval in seconds (0, 1, 5, 10, 15, 30, or 60)
       MonitoringRoleArn: !Ref MonitoringRole
-      DBClusterParameterGroupName: !Ref MyDBClusterParameterGroup
+      
 
