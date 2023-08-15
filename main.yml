@@ -11,7 +11,7 @@ Resources:
   RDSAuroraPostgreSQLStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: 'https://cf-s3-sqs-test.s3.amazonaws.com/rds.yml'
+      TemplateURL: 'https://cf-sqs-s3-1327.s3.amazonaws.com/rds.yml'
       Parameters:
         DBName: MyDatabase
         SGName: WD-SG-Prod-01
@@ -30,6 +30,7 @@ Resources:
         EnvironmentName: "prod"
         EnvironmentName1: "prod"
         EnvironmentName2: "prod"
+        EnableEncryption: 'true'
         Version: '11.19'
         VPCID: !Ref VPCID
         SubnetIds: !Join [",", !Ref SubnetIds] 
@@ -40,7 +41,7 @@ Resources:
   SQSAndDLQStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: 'https://cf-s3-sqs-test.s3.amazonaws.com/sqs.yml'
+      TemplateURL: 'https://cf-sqs-s3-1327.s3.amazonaws.com/sqs.yml'
       Parameters:
         QueueName: MyQueue
         DLQName: MyDeadLetterQueue
@@ -53,4 +54,5 @@ Resources:
         EnvironmentName: "prod"
         EnvironmentName1: "prod"
         EnvironmentName2: "prod"
+        QueueType: 'FIFO'
 

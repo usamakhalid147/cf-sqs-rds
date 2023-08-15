@@ -42,11 +42,18 @@ Parameters:
     Type: String
   MaxCapacity:
     Description: 'Master username for the database'
-    Type: Number
+    Type: String
   MasterPassword:
     Description: 'Master password for the database'
-    Type: Number
+    Type: String
     NoEcho: true
+  EnableEncryption:
+    Description: 'Enable storage encryption for the RDS cluster'
+    Type: String
+    Default: 'true'
+    AllowedValues:
+      - 'true'
+      - 'false'
 
   Version:
     Description: 'PostgreSQL version'
@@ -149,17 +156,17 @@ Resources:
       DBSubnetGroupName: !Ref DBSubnetGroup
       VpcSecurityGroupIds:
         - !Ref SecurityGroup
-      StorageEncrypted: true
-      BackupRetentionPeriod: 7 # Number of days to retain backups
+      StorageEncrypted: !Ref EnableEncryption
+      BackupRetentionPeriod: 7
       DeletionProtection: false
       AvailabilityZones:
         - !Ref AZ1
         - !Ref AZ2
       ScalingConfiguration:
-        AutoPause: true
-        MinCapacity: !Ref MinCapacity # Parameterized
-        MaxCapacity: !Ref MaxCapacity # Parameterized
-      PreferredBackupWindow: !Ref PreferredBackupWindow # Added
+        AutoPause: false
+        MinCapacity: !Ref MinCapacity
+        MaxCapacity: !Ref MaxCapacity
+      PreferredBackupWindow: !Ref PreferredBackupWindow
       PreferredMaintenanceWindow: !Ref PreferredMaintenanceWindow
       Tags: 
         - Key: environment

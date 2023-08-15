@@ -33,7 +33,13 @@ Parameters:
     Type: Number
     Default: 1
     MinValue: 1
-
+  QueueType:
+    Description: 'Type of the queue (Standard or FIFO)'
+    Type: String
+    Default: 'Standard'
+    AllowedValues:
+      - 'Standard'
+      - 'FIFO'
   EnvironmentName:
     Type: String
     Default: "prod"
@@ -42,6 +48,8 @@ Parameters:
   EnvironmentName2:
     Type: String
 
+Conditions:
+  IsFIFOQueue: !Equals [!Ref QueueType, 'FIFO']
 
 Resources:
   DeadLetterQueue:
@@ -71,7 +79,8 @@ Resources:
   MainQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub "SQS${QueueName}${Environment}${Increment}"  
+      QueueName: !If [IsFIFOQueue, !Sub "SQS${QueueName}${Environment}${Increment}.fifo", !Sub "SQS${QueueName}${Environment}${Increment}"]
+      FifoQueue: !If [IsFIFOQueue, 'true', !Ref 'AWS::NoValue']
       DelaySeconds: !Ref DelaySeconds
       MessageRetentionPeriod: !Ref MessageRetentionPeriod
       VisibilityTimeout: !Ref VisibilityTimeout
